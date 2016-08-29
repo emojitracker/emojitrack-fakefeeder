@@ -84,7 +84,6 @@ func main() {
 	// }
 
 	// reset Redis main counter to that state
-	c.Do("DEL", "emojitrack_score")
 	for _, er := range emojiRankings {
 		c.Do("ZADD", "emojitrack_score", er.score, er.id)
 		// generate 10 random tweets for each existing ID
