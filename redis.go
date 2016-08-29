@@ -31,6 +31,7 @@ func newPool(server, password string) *redis.Pool {
 		MaxIdle:     3,
 		IdleTimeout: 240 * time.Second,
 		Dial: func() (redis.Conn, error) {
+			log.Println("REDISPOOL: Dialing a new Redis connection...")
 			c, err := redis.Dial("tcp", server)
 			if err != nil {
 				return nil, err
@@ -44,6 +45,7 @@ func newPool(server, password string) *redis.Pool {
 			return c, err
 		},
 		TestOnBorrow: func(c redis.Conn, t time.Time) error {
+			log.Println("REDISPOOL: testing on borrow")
 			_, err := c.Do("PING")
 			return err
 		},
