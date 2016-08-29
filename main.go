@@ -93,7 +93,7 @@ func main() {
 	}
 
 	// start feeding redis random updates
-	period := time.Duration(float64(1)/float64(*rate)) * time.Second
+	period := time.Second / time.Duration(*rate)
 	for {
 		time.Sleep(period)
 
