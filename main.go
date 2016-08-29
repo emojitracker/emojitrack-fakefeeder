@@ -74,6 +74,9 @@ func main() {
 	initRedis()
 	c := redisPool.Get()
 	defer c.Close()
+	if _, err := c.Do("PING"); err != nil {
+		log.Fatal("Redis connection failed: ", err)
+	}
 
 	// populate initial state internally
 	// for _, er := range emojiRankings {
