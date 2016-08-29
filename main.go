@@ -63,7 +63,7 @@ func main() {
 	flag.Parse()
 
 	// echo startup status
-	fmt.Printf("TARGET_URL: %v (rate: %d/sec.)\n", *targetURL, *rate)
+	log.Printf("Starting up. TARGET_URL: %v (rate: %d/sec.)\n", *targetURL, *rate)
 
 	// paranoid safety check: refuse to go anywhere near a production DB
 	if strings.Contains(*targetURL, "rediscloud") {
@@ -97,5 +97,9 @@ func main() {
 		e := *randomEmoji()
 		t := randomUpdateForEmoji(e)
 		updateScript.Do(c, e.id, t.Encoded())
+
+		if *verbose {
+			log.Println("Sent fake update for ", e)
+		}
 	}
 }
