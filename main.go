@@ -84,6 +84,7 @@ func main() {
 	// }
 
 	// reset Redis main counter to that state
+	log.Println("Setting up initial state...")
 	for _, er := range emojiRankings {
 		c.Do("ZADD", "emojitrack_score", er.score, er.id)
 		// generate 10 random tweets for each existing ID
@@ -93,6 +94,7 @@ func main() {
 
 	// start feeding redis random updates
 	period := time.Second / time.Duration(*rate)
+	log.Println("Now starting to send fake updates every", period)
 	for {
 		time.Sleep(period)
 
