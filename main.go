@@ -100,7 +100,7 @@ func main() {
 
 		e := *randomEmoji()
 		t := randomUpdateForEmoji(e)
-		updateScript.Do(c, e.id, t.Encoded())
+		updateScript.SendHash(c, e.id, t.Encoded())
 
 		if *verbose {
 			log.Println("Sent fake update for ", e)
