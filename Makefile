@@ -6,10 +6,15 @@ docker-tag := emojitracker/fakefeeder
 
 src := main.go redis.go data.go snapshot_data.go
 
-bin/$(app): $(src)
+default: bin/$(app)
+
+vendor:
+	glide install
+
+bin/$(app): $(src) vendor
 	go build -o $@
 
-$(static-app): $(src)
+$(static-app): $(src) vendor
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
 		go build -ldflags "-s" -a -installsuffix cgo -o $(static-app)
 

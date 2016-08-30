@@ -1,0 +1,7 @@
+package: github.com/mroth/emojitrack-fakefeeder
+import:
+- package: github.com/garyburd/redigo
+  version: ^1.0.0
+  subpackages:
+  - redis
+- package: github.com/icrowley/fake
