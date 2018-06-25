@@ -1,4 +1,4 @@
-package main // import "github.com/mroth/emojitrack-fakefeeder"
+package main // import "github.com/emojitracker/emojitrack-fakefeeder"
 
 import (
 	"encoding/json"
