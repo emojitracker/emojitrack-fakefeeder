@@ -1,8 +1,3 @@
-# FROM scratch
-# MAINTAINER Matthew Rothenberg <mroth@mroth.info>
-
-# COPY build/linux-amd64/emojitrack-fakefeeder /
-# ENTRYPOINT ["/emojitrack-fakefeeder"]
 FROM golang:1.10 AS builder
 
 RUN curl -fsSL -o /usr/local/bin/dep https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 && chmod +x /usr/local/bin/dep
