@@ -2,13 +2,13 @@
 
 
 [[projects]]
-  name = "github.com/garyburd/redigo"
+  name = "github.com/gomodule/redigo"
   packages = [
     "internal",
     "redis"
   ]
-  revision = "8873b2f1995f59d4bcdd2b0dc9858e2cb9bf0c13"
-  version = "v1.0.0"
+  revision = "9c11da706d9b7902c6da69c592f75637793fe121"
+  version = "v2.0.0"
 
 [[projects]]
   name = "github.com/icrowley/fake"
@@ -18,6 +18,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6fdff8210ac8568e4a1b19c88e156de9958b01ba8893c60391ed428adcc1a397"
+  inputs-digest = "2f9888c25cde0ab800e79a8116a0ef857f276ad90192a47a234f3287914a7a51"
   solver-name = "gps-cdcl"
   solver-version = 1
