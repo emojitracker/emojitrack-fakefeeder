@@ -8,7 +8,7 @@ src := main.go redis.go data.go snapshot_data.go
 default: bin/$(app)
 
 vendor:
-	glide install
+	dep ensure
 
 bin/$(app): $(src) vendor
 	go build -o $@
