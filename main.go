@@ -87,9 +87,15 @@ func main() {
 	log.Println("Setting up initial state...")
 	for _, er := range emojiRankings {
 		c.Do("ZADD", "emojitrack_score", er.score, er.id)
-		// generate 10 random tweets for each existing ID
-		t := randomUpdateForEmoji(er)
-		updateScript.Do(c, er.id, t.Encoded())
+	}
+
+	// generate 10 random tweets for each existing ID
+	log.Println("Mocking 10 initial tweets for each emoji...")
+	for _, er := range emojiRankings {
+		for i := 0; i < 10; i++ {
+			t := randomUpdateForEmoji(er)
+			updateScript.Do(c, er.id, t.Encoded())
+		}
 	}
 
 	// start feeding redis random updates
