@@ -54,7 +54,7 @@ func randomUpdateForEmoji(e emojiRanking) EnsmallenedTweet {
 		ScreenName:      fake.UserName(),
 		Name:            fake.FullName(),
 		Links:           []string{},
-		ProfileImageURL: "https://pbs.twimg.com/profile_images/724054682579161088/3GgLeR65_normal.jpg",
+		ProfileImageURL: "https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png",
 		CreatedAt:       time.Now(),
 	}
 }
