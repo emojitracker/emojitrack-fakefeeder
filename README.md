@@ -13,11 +13,15 @@ can be swapped in transparently for the actual `emojitrack-feeder` container.
 
 [emojitrack-feeder]: https://github.com/mroth/emojitrack-feeder
 
+[![Docker Build Status](https://img.shields.io/docker/build/emojitracker/fakefeeder.svg?style=flat-square)](https://hub.docker.com/r/emojitracker/fakefeeder/)
+
 ## Usage
 
     Usage of emojitrack-fakefeeder:
       -rate int
-        	number of updates per second to generate (default 250)
+          number of updates per second to generate (default 250)
       -target string
-        	URI for redis target (default "redis://localhost:6379")
+          URI for redis target (default "redis://localhost:6379")
       -v	verbose log all updates to stdout
+      -weight
+          weight random emoji probability based on history (default true)

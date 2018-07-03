@@ -16,7 +16,7 @@ import (
 
 var targetURL = flag.String("target", "redis://localhost:6379", "URI for redis target")
 var rate = flag.Int("rate", 250, "number of updates per second to generate")
-var weighted = flag.Bool("weight", true, "weight random emoji probability based on history")
+var weighted = flag.Bool("weight", true, "weight random update probability based on history")
 var verbose = flag.Bool("v", false, "verbose log all updates to stdout")
 
 // Placeholder for snapshot score values
