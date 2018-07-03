@@ -11,10 +11,12 @@ import (
 	"time"
 
 	"github.com/icrowley/fake"
+	"github.com/mroth/weightedrand"
 )
 
 var targetURL = flag.String("target", "redis://localhost:6379", "URI for redis target")
 var rate = flag.Int("rate", 250, "number of updates per second to generate")
+var weighted = flag.Bool("weight", true, "weight random emoji probability based on history")
 var verbose = flag.Bool("v", false, "verbose log all updates to stdout")
 
 // Placeholder for snapshot score values
@@ -78,11 +80,6 @@ func main() {
 		log.Fatal("Redis connection failed: ", err)
 	}
 
-	// populate initial state internally
-	// for _, er := range emojiRankings {
-	// 	initialScores[er.id] = er.score
-	// }
-
 	// reset Redis main counter to that state
 	log.Println("Setting up initial state...")
 	for _, er := range emojiRankings {
@@ -98,13 +95,27 @@ func main() {
 		}
 	}
 
+	// create weighted random choice data
+	var emojiChoices []weightedrand.Choice
+	for _, er := range emojiRankings {
+		ec := weightedrand.Choice{Item: er, Weight: er.score}
+		emojiChoices = append(emojiChoices, ec)
+	}
+	emojiChooser := weightedrand.NewChooser(emojiChoices...)
+
 	// start feeding redis random updates
 	period := time.Second / time.Duration(*rate)
 	log.Println("Now starting to send fake updates every", period)
 	for {
 		time.Sleep(period)
 
-		e := *randomEmoji()
+		var e emojiRanking
+		if *weighted {
+			e = emojiChooser.Pick().(emojiRanking)
+		} else {
+			e = *randomEmoji()
+		}
+
 		t := randomUpdateForEmoji(e)
 		updateScript.SendHash(c, e.id, t.Encoded())
 
