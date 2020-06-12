@@ -13,8 +13,8 @@ bin/$(app): $(src)
 container: $(src) Dockerfile
 	docker build -t $(docker-tag) .
 
-snapshot_data.go: scripts/generate_data.rb
-	ruby $< > $@
+snapshot_data.go: scripts/generate_snapshot.go
+	go generate
 
 clean:
 	rm -rf bin
