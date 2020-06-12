@@ -2,7 +2,7 @@
 require "net/http"
 require "json"
 
-RANKINGS_URL = "http://emojitracker.com/api/rankings"
+RANKINGS_URL = "https://api.emojitracker.com/v1/rankings"
 
 resp = Net::HTTP.get_response(URI.parse(RANKINGS_URL))
 abort "Failed to retrieve remote rankings "if resp.code != '200'
