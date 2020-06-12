@@ -7,10 +7,7 @@ src := main.go redis.go data.go snapshot_data.go
 
 default: bin/$(app)
 
-vendor:
-	dep ensure
-
-bin/$(app): $(src) vendor
+bin/$(app): $(src)
 	go build -o $@
 
 container: $(src) Dockerfile
