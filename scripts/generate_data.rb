@@ -9,14 +9,14 @@ abort "Failed to retrieve remote rankings "if resp.code != '200'
 results = JSON.parse(resp.body, {:symbolize_names => true})
 
 formatted = results.map do |t|
-  %Q[\temojiRanking{char: "#{t[:char]}", id: "#{t[:id]}", name: "#{t[:name]}", score: #{t[:score]}},]
+  %Q[\t{char: "#{t[:char]}", id: "#{t[:id]}", name: "#{t[:name]}", score: #{t[:score]}},]
 end
 
-puts %[// Automatically generated file -- do not edit directly!
-// see `scripts/generate_data.rb` if need to change.
+puts %[// Code generated via `scripts/generate_data.rb` -- DO NOT EDIT.
+// Data obtained from #{RANKINGS_URL} at #{Time.now}.
+
 package main
 
-// data obtained from #{RANKINGS_URL} at #{Time.now}
 var emojiRankings = []emojiRanking{
 #{formatted.join("\n")}
 }
