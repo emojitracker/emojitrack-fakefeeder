@@ -1,0 +1,11 @@
+# this setup basically just lets us see writes working for manual verification
+version: "3.8"
+services:
+  feeder:
+    image: emojitracker/fakefeeder
+    build: .
+    links:
+      - redis
+    command: ["-v", "-target=redis://redis:6379"]
+  redis:
+    image: redis:alpine
