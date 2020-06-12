@@ -35,19 +35,17 @@ func main() {
 		log.Fatal("Redis connection failed: ", err)
 	}
 
-	// reset Redis main counter to that state
+	// set up initial state in redis
 	log.Println("Setting up initial state...")
-	for _, er := range emojiRankings {
-		c.Do("ZADD", "emojitrack_score", er.score, er.id)
+	// reset counts to equal snapshot
+	err := seedScores(c)
+	if err != nil {
+		log.Fatal("FATAL: could not seed initial scores: ", err)
 	}
-
-	// generate 10 random tweets for each existing ID
-	log.Println("Mocking 10 initial tweets for each emoji...")
-	for _, er := range emojiRankings {
-		for i := 0; i < 10; i++ {
-			t := randomUpdateForEmoji(er)
-			updateScript.Do(c, er.id, t.MustEncode())
-		}
+	// mock historic tweet sliding window for each emoji
+	err = seedTweets(c)
+	if err != nil {
+		log.Fatal("FATAL: could not seed initial tweets: ", err)
 	}
 
 	// create weighted random choice data
@@ -61,6 +59,7 @@ func main() {
 	// start feeding redis random updates
 	period := time.Second / time.Duration(*rate)
 	log.Println("Now starting to send fake updates every", period)
+	_ = updateScript.Load(c)
 	for {
 		time.Sleep(period)
 
@@ -76,7 +75,7 @@ func main() {
 		c.Flush()
 
 		if *verbose {
-			log.Println("Sent fake update for ", e)
+			log.Println("Sent fake update for", e)
 		}
 	}
 }
