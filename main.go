@@ -98,7 +98,7 @@ func main() {
 	// create weighted random choice data
 	var emojiChoices []weightedrand.Choice
 	for _, er := range emojiRankings {
-		ec := weightedrand.Choice{Item: er, Weight: er.score}
+		ec := weightedrand.Choice{Item: er, Weight: uint(er.score)}
 		emojiChoices = append(emojiChoices, ec)
 	}
 	emojiChooser := weightedrand.NewChooser(emojiChoices...)
