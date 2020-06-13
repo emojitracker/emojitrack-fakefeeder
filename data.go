@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gomodule/redigo/redis"
 	"github.com/icrowley/fake"
 )
 
@@ -48,7 +47,7 @@ func (t *EnsmallenedTweet) MustEncode() []byte {
 	return b
 }
 
-func randomUpdateForEmoji(e emojiRanking) EnsmallenedTweet {
+func randomTweetForEmoji(e emojiRanking) EnsmallenedTweet {
 	globalTweetID += 42
 
 	return EnsmallenedTweet{
@@ -60,35 +59,4 @@ func randomUpdateForEmoji(e emojiRanking) EnsmallenedTweet {
 		ProfileImageURL: "https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png",
 		CreatedAt:       time.Now(),
 	}
-}
-
-// seedScores sets all scores in redis.Conn c to match snapshot data
-func seedScores(c redis.Conn) error {
-	c.Send("MULTI")
-	for _, r := range emojiRankings {
-		err := c.Send("ZADD", "emojitrack_score", r.score, r.id)
-		if err != nil {
-			return err
-		}
-	}
-	_, err := c.Do("EXEC")
-	return err
-}
-
-// seedTweets generate 10 initial random tweets for each existing emoji, such that
-// initial buffer for historical window is filled.
-func seedTweets(c redis.Conn) error {
-	c.Send("MULTI")
-	for _, r := range emojiRankings {
-		for i := 0; i < 10; i++ {
-			t := randomUpdateForEmoji(r)
-			tKey := "emojitrack_tweets_" + r.id
-			err := c.Send("LPUSH", tKey, t.MustEncode())
-			if err != nil {
-				return err
-			}
-		}
-	}
-	_, err := c.Do("EXEC")
-	return err
 }

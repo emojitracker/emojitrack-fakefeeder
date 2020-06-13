@@ -1,17 +1,17 @@
-.PHONY: container clean clobber
+.PHONY: image clean clobber
 
 app        := emojitrack-fakefeeder
 docker-tag := emojitracker/fakefeeder
 
-src := main.go redis.go data.go snapshot_data.go
+src := main.go redis.go data.go feeder.go snapshot_data.go
 
 default: bin/$(app)
 
 bin/$(app): $(src)
 	go build -o $@
 
-container: $(src) Dockerfile
-	docker build -t $(docker-tag) .
+image: $(src) Dockerfile
+	DOCKER_BUILDKIT=1 docker build -t $(docker-tag) .
 
 snapshot_data.go: scripts/generate_snapshot.go
 	go generate
