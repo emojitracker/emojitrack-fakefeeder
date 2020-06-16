@@ -10,6 +10,7 @@ import (
 	"time"
 
 	fakefeeder "github.com/emojitracker/emojitrack-fakefeeder"
+	rankings "github.com/emojitracker/emojitrack-fakefeeder/rankings"
 )
 
 var (
@@ -40,7 +41,7 @@ func main() {
 
 	// set up feeder with initial state in redis
 	logger.Println("Setting up initial feeder state...")
-	feeder, err := fakefeeder.NewFeeder(pool, fakefeeder.Snapshot(), *weighted)
+	feeder, err := fakefeeder.NewFeeder(pool, rankings.Snapshot(), *weighted)
 	if err != nil {
 		logger.Fatal(err)
 	}
