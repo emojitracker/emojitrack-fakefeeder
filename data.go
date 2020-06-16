@@ -9,8 +9,6 @@ import (
 	"github.com/icrowley/fake"
 )
 
-//go:generate go run ./scripts/generate_snapshot.go -- snapshot_data.go
-
 // Ranking defines the score for a single emoji glyph from the Emojitracker API.
 type Ranking struct {
 	Char  string `json:"char"`

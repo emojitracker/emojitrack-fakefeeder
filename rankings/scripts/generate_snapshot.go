@@ -3,32 +3,25 @@
 package main
 
 import (
-	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"strings"
 	"text/template"
 	"time"
 
 	fakefeeder "github.com/emojitracker/emojitrack-fakefeeder"
+	rankings "github.com/emojitracker/emojitrack-fakefeeder/rankings"
 )
 
-const (
-	rankingsURL = "https://api.emojitracker.com/v1/rankings"
-)
-
-type rankings []fakefeeder.Ranking
+type rankingCollection []fakefeeder.Ranking
 
 // Override output format for code generation, creates identical output for the
 // data structure to the old hand-written Go from the previous Ruby script.
-func (r rankings) GoString() string {
+func (r rankingCollection) GoString() string {
 	var b strings.Builder
-	b.WriteString("[]Ranking{")
+	b.WriteString("[]fakefeeder.Ranking{")
 	for _, v := range r {
 		b.WriteString(
 			fmt.Sprintf(
@@ -41,38 +34,19 @@ func (r rankings) GoString() string {
 	return b.String()
 }
 
-func getRankings(url string) (results rankings, err error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		err = errors.New("not OK status when retrieving remote rankings")
-		return
-	}
-
-	defer resp.Body.Close()
-	dat, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	}
-
-	err = json.Unmarshal(dat, &results)
-	return
-}
-
 const snapshotTmpl = `// Code generated via scripts/generate_snapshot.go -- DO NOT EDIT.
 // Data obtained from {{.Source}} at {{ .Time.Format "2006-01-02 15:04:05 -0700" }}.
 
-package fakefeeder
+package rankings
 
-// Snapshot returns the most recent snapshot of rankings from the Emojitracker API
-func Snapshot() []Ranking {
-	return emojiRankings
+import "github.com/emojitracker/emojitrack-fakefeeder"
+
+// Snapshot returns the archived snapshot of rankings from the Emojitracker API.
+func Snapshot() []fakefeeder.Ranking {
+	return snapshotData
 }
 
-var emojiRankings = {{ printf "%#v" .Data }}
+var snapshotData = {{ printf "%#v" .Data }}
 `
 
 var tmpl = template.Must(template.New("snapshot").Parse(snapshotTmpl))
@@ -85,7 +59,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	ranks, err := getRankings(rankingsURL)
+	ranks, err := rankings.Live(rankings.EmojitrackerV1APIRankingsURL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -98,9 +72,9 @@ func main() {
 	data := struct {
 		Source string
 		Time   time.Time
-		Data   rankings
+		Data   rankingCollection
 	}{
-		rankingsURL,
+		rankings.EmojitrackerV1APIRankingsURL,
 		time.Now(),
 		ranks,
 	}
