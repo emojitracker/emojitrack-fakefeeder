@@ -1,4 +1,4 @@
-package main
+package fakefeeder
 
 import (
 	"context"
@@ -18,8 +18,8 @@ import (
 // on the other components of Emojitracker within a docker network.
 type Feeder struct {
 	rp            *redis.Pool
-	seed          []emojiRanking
-	chooseFunc    func() emojiRanking
+	seed          []Ranking
+	chooseFunc    func() Ranking
 	VerboseLogger logger // override to enable verbose update logging
 }
 
@@ -38,7 +38,7 @@ type logger interface {
 //
 // NewFeeder will return an error if it was unable to properly seed the redis
 // instance in any fashion.
-func NewFeeder(p *redis.Pool, seed []emojiRanking, weight bool) (*Feeder, error) {
+func NewFeeder(p *redis.Pool, seed []Ranking, weight bool) (*Feeder, error) {
 	f := Feeder{
 		rp:         p,
 		seed:       seed,
@@ -84,7 +84,7 @@ const (
 func (f *Feeder) seedScores(c redis.Conn) error {
 	c.Send(rMULTI)
 	for _, r := range f.seed {
-		err := c.Send(rZADD, rScoreKey, r.score, r.id)
+		err := c.Send(rZADD, rScoreKey, r.Score, r.ID)
 		if err != nil {
 			return err
 		}
@@ -100,7 +100,7 @@ func (f *Feeder) seedTweets(c redis.Conn) error {
 	for _, r := range f.seed {
 		for i := 0; i < 10; i++ {
 			t := randomTweetForEmoji(r)
-			tKey := rTweetKeyPrefix + r.id
+			tKey := rTweetKeyPrefix + r.ID
 			err := c.Send(rLPUSH, tKey, t.MustEncode())
 			if err != nil {
 				return err
@@ -111,10 +111,10 @@ func (f *Feeder) seedTweets(c redis.Conn) error {
 	return err
 }
 
-func buildChooseFunc(seed []emojiRanking, weighted bool) func() emojiRanking {
+func buildChooseFunc(seed []Ranking, weighted bool) func() Ranking {
 	// non-weighted, simple random choice
 	if !weighted {
-		cf := func() emojiRanking {
+		cf := func() Ranking {
 			return seed[rand.Intn(len(seed))]
 		}
 		return cf
@@ -123,12 +123,12 @@ func buildChooseFunc(seed []emojiRanking, weighted bool) func() emojiRanking {
 	// weighted random distribution (using github.com/mroth/weightedrand)
 	choices := make([]weightedrand.Choice, 0, len(seed))
 	for _, r := range seed {
-		c := weightedrand.Choice{Item: r, Weight: uint(r.score)}
+		c := weightedrand.Choice{Item: r, Weight: uint(r.Score)}
 		choices = append(choices, c)
 	}
 	chooser := weightedrand.NewChooser(choices...)
-	cf := func() emojiRanking {
-		return chooser.Pick().(emojiRanking)
+	cf := func() Ranking {
+		return chooser.Pick().(Ranking)
 	}
 	return cf
 }
@@ -141,7 +141,7 @@ func (f *Feeder) Update() error {
 	emoji := f.chooseFunc()
 	tweet := randomTweetForEmoji(emoji)
 	payload := tweet.MustEncode()
-	if err := updateScript.SendHash(c, emoji.id, payload); err != nil {
+	if err := updateScript.SendHash(c, emoji.ID, payload); err != nil {
 		return err
 	}
 	c.Flush()

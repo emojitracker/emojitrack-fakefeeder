@@ -14,30 +14,25 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	fakefeeder "github.com/emojitracker/emojitrack-fakefeeder"
 )
 
 const (
 	rankingsURL = "https://api.emojitracker.com/v1/rankings"
 )
 
-type ranking struct {
-	Char  string `json:"char"`
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-	Score int    `json:"score"`
-}
-
-type rankings []ranking
+type rankings []fakefeeder.Ranking
 
 // Override output format for code generation, creates identical output for the
 // data structure to the old hand-written Go from the previous Ruby script.
 func (r rankings) GoString() string {
 	var b strings.Builder
-	b.WriteString("[]emojiRanking{")
+	b.WriteString("[]Ranking{")
 	for _, v := range r {
 		b.WriteString(
 			fmt.Sprintf(
-				"\n\t{char: \"%s\", id: \"%s\", name: \"%s\", score: %d},",
+				"\n\t{Char: \"%s\", ID: \"%s\", Name: \"%s\", Score: %d},",
 				v.Char, v.ID, v.Name, v.Score,
 			),
 		)
@@ -70,7 +65,12 @@ func getRankings(url string) (results rankings, err error) {
 const snapshotTmpl = `// Code generated via scripts/generate_snapshot.go -- DO NOT EDIT.
 // Data obtained from {{.Source}} at {{ .Time.Format "2006-01-02 15:04:05 -0700" }}.
 
-package main
+package fakefeeder
+
+// Snapshot returns the most recent snapshot of rankings from the Emojitracker API
+func Snapshot() []Ranking {
+	return emojiRankings
+}
 
 var emojiRankings = {{ printf "%#v" .Data }}
 `
