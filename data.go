@@ -1,9 +1,8 @@
-package main
+package fakefeeder
 
 import (
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"strconv"
 	"time"
 
@@ -12,18 +11,16 @@ import (
 
 //go:generate go run ./scripts/generate_snapshot.go -- snapshot_data.go
 
-type emojiRanking struct {
-	char, id, name string
-	score          int
+// Ranking defines the score for a single emoji glyph from the Emojitracker API.
+type Ranking struct {
+	Char  string `json:"char"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Score int    `json:"score"`
 }
 
 // a semi realistic scale of where tweet IDs currently are at
 var globalTweetID = 769706198425825280
-
-// pick a random ID for an existing emoji in counter
-func randomEmoji() *emojiRanking {
-	return &emojiRankings[rand.Intn(len(emojiRankings))]
-}
 
 // EnsmallenedTweet matches the structure used by emojitrack-feeder for sending
 // out bandwidth efficient tweets.
@@ -47,12 +44,12 @@ func (t *EnsmallenedTweet) MustEncode() []byte {
 	return b
 }
 
-func randomTweetForEmoji(e emojiRanking) EnsmallenedTweet {
+func randomTweetForEmoji(r Ranking) EnsmallenedTweet {
 	globalTweetID += 42
 
 	return EnsmallenedTweet{
 		ID:              strconv.Itoa(globalTweetID),
-		Text:            fmt.Sprintf("%s %s", fake.Sentence(), e.char),
+		Text:            fmt.Sprintf("%s %s", fake.Sentence(), r.Char),
 		ScreenName:      fake.UserName(),
 		Name:            fake.FullName(),
 		Links:           []string{},
