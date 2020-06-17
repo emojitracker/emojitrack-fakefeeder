@@ -6,6 +6,8 @@ services:
     build: .
     links:
       - redis
-    command: ["-v", "-target=redis://redis:6379"]
+    command: ["-target=redis://redis:6379", "-rate=150"]
   redis:
     image: redis:alpine
+    ports:
+        - "6379:6379"
