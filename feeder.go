@@ -39,13 +39,17 @@ type logger interface {
 // NewFeeder will return an error if it was unable to properly seed the redis
 // instance in any fashion.
 func NewFeeder(p *redis.Pool, seed []Ranking, weight bool) (*Feeder, error) {
+	cf, err := buildChooseFunc(seed, weight)
+	if err != nil {
+		return nil, err
+	}
 	f := Feeder{
 		rp:         p,
 		seed:       seed,
-		chooseFunc: buildChooseFunc(seed, weight),
+		chooseFunc: cf,
 	}
 
-	err := f.init()
+	err = f.init()
 	return &f, err
 }
 
@@ -111,13 +115,13 @@ func (f *Feeder) seedTweets(c redis.Conn) error {
 	return err
 }
 
-func buildChooseFunc(seed []Ranking, weighted bool) func() Ranking {
+func buildChooseFunc(seed []Ranking, weighted bool) (func() Ranking, error) {
 	// non-weighted, simple random choice
 	if !weighted {
 		cf := func() Ranking {
 			return seed[rand.Intn(len(seed))]
 		}
-		return cf
+		return cf, nil
 	}
 
 	// weighted random distribution (using github.com/mroth/weightedrand)
@@ -126,11 +130,14 @@ func buildChooseFunc(seed []Ranking, weighted bool) func() Ranking {
 		c := weightedrand.Choice{Item: r, Weight: uint(r.Score)}
 		choices = append(choices, c)
 	}
-	chooser := weightedrand.NewChooser(choices...)
+	chooser, err := weightedrand.NewChooser(choices...)
+	if err != nil {
+		return nil, err
+	}
 	cf := func() Ranking {
 		return chooser.Pick().(Ranking)
 	}
-	return cf
+	return cf, nil
 }
 
 // Update sends a single random update to the configured redis instance.
