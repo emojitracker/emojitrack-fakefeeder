@@ -13,7 +13,7 @@ can be swapped in transparently for the actual `emojitrack-feeder` container.
 
 [emojitrack-feeder]: https://github.com/mroth/emojitrack-feeder
 
-[![Docker Build Status](https://img.shields.io/docker/build/emojitracker/fakefeeder.svg?style=flat-square)](https://hub.docker.com/r/emojitracker/fakefeeder/)
+[![Docker Build Status](https://img.shields.io/docker/cloud/build/emojitracker/fakefeeder.svg?style=flat-square)](https://hub.docker.com/r/emojitracker/fakefeeder/)
 
 ## Usage
 
